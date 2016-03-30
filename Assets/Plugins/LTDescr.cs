@@ -8,6 +8,7 @@ public interface LTDescr
 	bool useEstimatedTime { get; set; }
 	bool useFrames { get; set; }
 	bool useManualTime { get; set; }
+	bool pixelSnap { get; set; }
 	bool hasInitiliazed { get; set; }
 	bool hasPhysics { get; set; }
 	bool onCompleteOnRepeat { get; set; }
@@ -105,6 +106,7 @@ public interface LTDescr
 	LTDescr setOvershoot(float overshoot);
 	LTDescr setPath(LTBezierPath path);
 	LTDescr setPeriod(float period);
+	LTDescr setPixelSnap(bool pixelSnap);
 	LTDescr setPoint(UnityEngine.Vector3 point);
 	LTDescr setRect(LTRect rect);
 	LTDescr setRect(UnityEngine.Rect rect);

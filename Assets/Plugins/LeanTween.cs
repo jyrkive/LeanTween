@@ -236,6 +236,7 @@ public class LTDescrImpl : LTDescr {
 	public bool useManualTime { get; set; }
 	public bool hasInitiliazed { get; set; }
 	public bool hasPhysics { get; set; }
+	public bool pixelSnap { get; set; }
 	public bool onCompleteOnRepeat { get; set; }
 	public bool onCompleteOnStart { get; set; }
 	public float passed { get; set; }
@@ -344,7 +345,7 @@ public class LTDescrImpl : LTDescr {
 		#endif
 		this.trans = null;
 		this.passed = this.delay = this.lastVal = 0.0f;
-		this.hasUpdateCallback = this.useEstimatedTime = this.useFrames = this.hasInitiliazed = this.onCompleteOnRepeat = this.destroyOnComplete = this.onCompleteOnStart = this.useManualTime = false;
+		this.hasUpdateCallback = this.useEstimatedTime = this.useFrames = this.hasInitiliazed = this.onCompleteOnRepeat = this.destroyOnComplete = this.onCompleteOnStart = this.useManualTime = this.pixelSnap = false;
 		this.animationCurve = null;
 		this.tweenType = LeanTweenType.linear;
 		this.loopType = LeanTweenType.once;
@@ -1242,6 +1243,22 @@ public class LTDescrImpl : LTDescr {
     	
     	return this;
     }
+
+	/**
+	* If the tween is a movement tween, force the object to only visit positions whose coordinates are an exact multiple
+	* of (1 / pixelsPerUnit). Especially useful for pixel art, where pixel snap is an useful part of emulating a low
+	* screen resolution.
+	* @method setPixelSnap ()
+	* @param {bool} isOn:bool does snap positions into the pixel grid
+	* @return {LTDescr} LTDescr an object that distinguishes the tween
+	* @example
+	* LeanTween.moveX(gameObject, 5f, 2.0f).setPixelSnap(true);
+	*/
+
+	public LTDescr setPixelSnap( bool isOn ){
+		this.pixelSnap = isOn;
+		return this;
+	}
 }
 
 public class LTUtility {
@@ -1286,7 +1303,8 @@ public class LTUtility {
 public class LeanTween : MonoBehaviour {
 
 public static bool throwErrors = true;
-public static float tau = Mathf.PI*2.0f; 
+public static float tau = Mathf.PI*2.0f;
+public static float pixelsPerUnit = 100.0f;
 
 private static LTDescrImpl[] tweens;
 private static int[] tweensFinished;
@@ -1920,6 +1938,12 @@ public static void update() {
 							}else{
 								newVect = new Vector3( tween.from.x + tween.diff.x * ratioPassed, tween.from.y + tween.diff.y * ratioPassed, tween.from.z + tween.diff.z * ratioPassed);
 							}
+						}
+
+						if (tween.pixelSnap){
+							newVect.x = Mathf.Round(newVect.x * pixelsPerUnit) / pixelsPerUnit;
+							newVect.y = Mathf.Round(newVect.y * pixelsPerUnit) / pixelsPerUnit;
+							newVect.z = Mathf.Round(newVect.z * pixelsPerUnit) / pixelsPerUnit;
 						}
 						 
 						if(tweenAction==TweenAction.MOVE){
